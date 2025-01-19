@@ -22,14 +22,14 @@ type FileUploadService struct {
 	configuration   *viper.Viper
 }
 
-func NewFileUploadService(minioClient *config.MinioClient, repository *repository.FileUploadLogRepository, publisher *config.Publisher, configuration *viper.Viper) *FileUploadService {
+func NewFileUploadService(repository *repository.FileUploadLogRepository, app *config.ApplicationBootstrap) *FileUploadService {
 
 	return &FileUploadService{
-		minioClient:     minioClient,
+		minioClient:     app.Minio,
 		fileRepository:  repository,
-		publisher:       publisher,
-		rabbitMqChannel: publisher.CreateChannel(),
-		configuration:   configuration,
+		publisher:       app.Publisher,
+		rabbitMqChannel: app.Publisher.CreateChannel(),
+		configuration:   app.Configuration,
 	}
 }
 

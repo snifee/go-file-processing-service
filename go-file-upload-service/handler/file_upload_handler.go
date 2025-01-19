@@ -15,10 +15,10 @@ type FileUploadHandler struct {
 	fileUploadService *service.FileUploadService
 }
 
-func NewFileUploadHandler(app *config.ApplocationBootstrap) *FileUploadHandler {
+func NewFileUploadHandler(app *config.ApplicationBootstrap) *FileUploadHandler {
 
-	repo := repository.NewFileUploadLogRepository(app.Database.DB)
-	service := service.NewFileUploadService(app.Minio, repo, app.Publisher, app.Configuration)
+	repo := repository.NewFileUploadLogRepository(app.Database)
+	service := service.NewFileUploadService(repo, app)
 
 	handler := &FileUploadHandler{
 		fileUploadService: service,

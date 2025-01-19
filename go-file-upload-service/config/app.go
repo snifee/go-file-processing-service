@@ -2,17 +2,18 @@ package config
 
 import (
 	"github.com/spf13/viper"
+	"gorm.io/gorm"
 )
 
-type ApplocationBootstrap struct {
-	Database      *Database
+type ApplicationBootstrap struct {
+	Database      *gorm.DB
 	Minio         *MinioClient
 	Publisher     *Publisher
 	Server        *Server
 	Configuration *viper.Viper
 }
 
-func NewAppication() *ApplocationBootstrap {
+func NewAppication() *ApplicationBootstrap {
 
 	configuration := NewViperConfig()
 
@@ -31,7 +32,7 @@ func NewAppication() *ApplocationBootstrap {
 	port := configuration.GetString("server.port")
 	server := NewServer(port)
 
-	return &ApplocationBootstrap{
+	return &ApplicationBootstrap{
 		Database:      db,
 		Minio:         minio,
 		Publisher:     publisher,
