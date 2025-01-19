@@ -6,13 +6,19 @@ import (
 	"github.com/spf13/viper"
 )
 
-func NewViperConfig() {
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".")
-	viper.SetConfigName("config.yaml")
+func NewViperConfig() *viper.Viper {
 
-	err := viper.ReadInConfig()
+	config := viper.New()
+
+	config.SetConfigName("config")
+	config.SetConfigType("yaml")
+	config.AddConfigPath("./../")
+	config.AddConfigPath("./")
+
+	err := config.ReadInConfig()
 	if err != nil {
 		log.Fatalln("fatal error config file: default \n", err)
 	}
+
+	return config
 }

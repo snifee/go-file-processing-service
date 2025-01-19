@@ -1,0 +1,31 @@
+services:
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    container_name: "minio"
+    volumes:
+      - ~/minio/data:/data
+    environment:
+      - MINIO_ROOT_USER=ROOTNAME
+      - MINIO_ROOT_PASSWORD=CHANGEME123
+    command: server /data --console-address ":9001"
+  rabbitmq:
+    image: docker.io/library/rabbitmq:4-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+  upload-service:
+    container_name: file-upload-service
+    image: docker.io/library/file-upload-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - minio
+      - rabbitmq
+volumes:
+  rabbitmq_data:

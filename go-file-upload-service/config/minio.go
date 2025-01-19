@@ -7,7 +7,6 @@ import (
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
-	"github.com/spf13/viper"
 )
 
 type MinioClient struct {
@@ -38,12 +37,11 @@ func NewMinioClient(endpoint, accesskey, secret string) *MinioClient {
 	}
 }
 
-func (m *MinioClient) PutObject(file multipart.File, fileName string, fileSize int64) (minio.UploadInfo, error) {
+func (m *MinioClient) PutObject(file multipart.File, fileName string, fileSize int64, bucketName string) (minio.UploadInfo, error) {
 
 	ctx := context.Background()
 
 	contentType := "application/octet-stream"
-	bucketName := viper.GetString("minio.dir.bucketName")
 
 	// Upload the test file with FPutObject
 	info, err := m.client.PutObject(ctx, bucketName, fileName, file, fileSize, minio.PutObjectOptions{ContentType: contentType})

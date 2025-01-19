@@ -3,6 +3,7 @@ package main
 import (
 	"go-file-upload-service/config"
 	"go-file-upload-service/handler"
+	"log"
 )
 
 func main() {
@@ -11,4 +12,5 @@ func main() {
 	handler.NewFileUploadHandler(app)
 
 	app.Server.Engine.Run(":8080")
+	log.Println("Application running")
 }

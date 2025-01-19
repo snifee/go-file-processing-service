@@ -18,7 +18,7 @@ type FileUploadHandler struct {
 func NewFileUploadHandler(app *config.ApplocationBootstrap) *FileUploadHandler {
 
 	repo := repository.NewFileUploadLogRepository(app.Database.DB)
-	service := service.NewFileUploadService(app.Minio, repo, app.Publisher)
+	service := service.NewFileUploadService(app.Minio, repo, app.Publisher, app.Configuration)
 
 	handler := &FileUploadHandler{
 		fileUploadService: service,

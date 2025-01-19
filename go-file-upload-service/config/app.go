@@ -5,32 +5,37 @@ import (
 )
 
 type ApplocationBootstrap struct {
-	Database  *Database
-	Minio     *MinioClient
-	Publisher *Publisher
-	Server    *Server
+	Database      *Database
+	Minio         *MinioClient
+	Publisher     *Publisher
+	Server        *Server
+	Configuration *viper.Viper
 }
 
 func NewAppication() *ApplocationBootstrap {
 
-	dsn := viper.GetString("postgres.dsn")
+	configuration := NewViperConfig()
+
+	dsn := configuration.GetString("postgres.dsn")
+
 	db := NewDatabase(dsn)
 
-	endpoint := viper.GetString("minio.endpoint")
-	accesskey := viper.GetString("minio.accessKey")
-	secret := viper.GetString("minio.secretKey")
+	endpoint := configuration.GetString("minio.endpoint")
+	accesskey := configuration.GetString("minio.accessKey")
+	secret := configuration.GetString("minio.secretKey")
 	minio := NewMinioClient(endpoint, accesskey, secret)
 
-	url := viper.GetString("rabbitmq.url")
+	url := configuration.GetString("rabbitmq.url")
 	publisher := NewPublisher(url)
 
-	port := viper.GetString("server.port")
+	port := configuration.GetString("server.port")
 	server := NewServer(port)
 
 	return &ApplocationBootstrap{
-		Database:  db,
-		Minio:     minio,
-		Publisher: publisher,
-		Server:    server,
+		Database:      db,
+		Minio:         minio,
+		Publisher:     publisher,
+		Server:        server,
+		Configuration: configuration,
 	}
 }

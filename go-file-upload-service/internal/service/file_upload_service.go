@@ -11,19 +11,25 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/spf13/viper"
 )
 
 type FileUploadService struct {
-	minioClient    *config.MinioClient
-	fileRepository *repository.FileUploadLogRepository
-	publisher      *config.Publisher
+	minioClient     *config.MinioClient
+	fileRepository  *repository.FileUploadLogRepository
+	publisher       *config.Publisher
+	rabbitMqChannel *config.PublisherChannel
+	configuration   *viper.Viper
 }
 
-func NewFileUploadService(minioClient *config.MinioClient, repository *repository.FileUploadLogRepository, publisher *config.Publisher) *FileUploadService {
+func NewFileUploadService(minioClient *config.MinioClient, repository *repository.FileUploadLogRepository, publisher *config.Publisher, configuration *viper.Viper) *FileUploadService {
+
 	return &FileUploadService{
-		minioClient:    minioClient,
-		fileRepository: repository,
-		publisher:      publisher,
+		minioClient:     minioClient,
+		fileRepository:  repository,
+		publisher:       publisher,
+		rabbitMqChannel: publisher.CreateChannel(),
+		configuration:   configuration,
 	}
 }
 
@@ -46,7 +52,7 @@ func (s *FileUploadService) UploadFile(request dto.FileUpload) error {
 	fileSize := request.File.Size
 	fileType := "xlsx"
 
-	info, err := s.minioClient.PutObject(file, fileName, fileSize)
+	info, err := s.minioClient.PutObject(file, fileName, fileSize, s.configuration.GetString("minio.dir.bucketName"))
 	if err != nil {
 		log.Printf("Error when upload file to minio: %s", err.Error())
 		return err
@@ -62,5 +68,7 @@ func (s *FileUploadService) UploadFile(request dto.FileUpload) error {
 	}
 
 	log.Printf("Successfully uploaded %s of size %d\n", fileName, info.Size)
+
+	s.rabbitMqChannel.SendMessage([]byte(fileName))
 	return nil
 }

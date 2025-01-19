@@ -37,14 +37,14 @@ func NewPublisher(url string) *Publisher {
 		log.Panicf("error when creating consumer connection: %v", err)
 	}
 
-	defer conn.Close()
+	// defer conn.Close()
 
 	return &Publisher{
 		conn: conn,
 	}
 }
 
-func (p *Publisher) createChannel() *PublisherChannel {
+func (p *Publisher) CreateChannel() *PublisherChannel {
 	ch, err := p.conn.Channel()
 
 	if err != nil {
@@ -70,7 +70,7 @@ func (p *Publisher) createChannel() *PublisherChannel {
 	}
 }
 
-func (ch *PublisherChannel) sendMessage(msg []byte) {
+func (ch *PublisherChannel) SendMessage(msg []byte) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

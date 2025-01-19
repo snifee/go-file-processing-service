@@ -1,5 +1,5 @@
 minio:
-  endpoint: localhost:9000
+  endpoint: host.docker.internal:9000
   credential: minioadmin:minioadmin
   accessKey: abcd123456
   secretKey: abcd123456
@@ -7,10 +7,10 @@ minio:
   dir:
     bucketName: test
 postgres:
- dsn: "host=localhost user=postgres password=postgres dbname=playground port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+ dsn: "host=host.docker.internal user=postgres password=postgres dbname=playground port=5432 sslmode=disable TimeZone=Asia/Shanghai"
  username: postgres
  password: postgres
 rabbitmq:
- url: amqp://guest:guest@localhost:5672/
+ url: amqp://dev:dev@host.docker.internal:5672/
 server:
  port: 8080
