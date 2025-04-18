@@ -22,7 +22,7 @@ func NewAppication() *ApplicationBootstrap {
 		configuration.GetString("minio.accessKey"),
 		configuration.GetString("minio.secretKey"),
 	)
-	consumer := NewConsumer(configuration.GetString("rabbitmq.url"))
+	consumer := NewConsumer(configuration.GetString("rabbitmq.url"), "file_process_1")
 	server := NewServer(configuration.GetString("server.port"))
 
 	return &ApplicationBootstrap{

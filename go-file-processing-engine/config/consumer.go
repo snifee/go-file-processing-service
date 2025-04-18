@@ -1,7 +1,9 @@
 package config
 
 import (
+	"context"
 	"log"
+	"time"
 
 	"github.com/rabbitmq/amqp091-go"
 )
@@ -11,23 +13,16 @@ Consumer hold the connection to
 rabbitmq instance
 */
 type Consumer struct {
-	conn *amqp091.Connection
-}
-
-/*
-ConsumerChannel hold channel and its
-queue on every new channel creation
-*/
-type ConsumerChannel struct {
+	conn    *amqp091.Connection
 	channel *amqp091.Channel
 	queue   amqp091.Queue
 }
 
 /*
-NewPublisher function is use to create
+NewConsumer function is use to create
 new connection
 */
-func NewConsumer(url string) *Consumer {
+func NewConsumer(url string, queueName string) *Consumer {
 
 	conn, err := amqp091.Dial(url)
 
@@ -37,55 +32,52 @@ func NewConsumer(url string) *Consumer {
 
 	// defer conn.Close()
 
+	ch, err := conn.Channel()
+
+	if err != nil {
+		log.Fatalf("error when creating consumer channel: %v", err)
+	}
+
+	queue, err := ch.QueueDeclare(
+		queueName, // name
+		false,     // durable
+		false,     // delete when unused
+		false,     // exclusive
+		false,     // no-wait
+		nil,       // arguments
+	)
+
+	if err != nil {
+		log.Fatalf("error when creating queue in channel: %v", err)
+	}
+
 	return &Consumer{
-		conn: conn,
+		conn:    conn,
+		channel: ch,
+		queue:   queue,
 	}
 }
 
-// func (p *Consumer) CreateChannel() *ConsumerChannel {
-// 	ch, err := p.conn.Channel()
+func (c *Consumer) ReceiveMessage() (<-chan amqp091.Delivery, error) {
 
-// 	if err != nil {
-// 		log.Fatalf("error when creating consumer channel: %v", err)
-// 	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
-// 	queue, err := ch.QueueDeclare(
-// 		"file-processing-queue", // name
-// 		false,                   // durable
-// 		false,                   // delete when unused
-// 		false,                   // exclusive
-// 		false,                   // no-wait
-// 		nil,                     // arguments
-// 	)
+	msgs, err := c.channel.ConsumeWithContext(
+		ctx,
+		c.queue.Name,
+		"",
+		false,
+		false,
+		false,
+		false,
+		nil,
+	)
 
-// 	if err != nil {
-// 		log.Fatalf("error when creating queue in channel: %v", err)
-// 	}
+	if err != nil {
+		log.Printf("error when reading msg from broker : %v", err)
+		return msgs, err
+	}
 
-// 	return &ConsumerChannel{
-// 		channel: ch,
-// 		queue:   queue,
-// 	}
-// }
-
-// func (ch *ConsumerChannel) ReceiveMessage() any {
-
-// 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-// 	defer cancel()
-
-// 	err := ch.channel.ConsumeWithContext(ctx,
-// 		ch.queue.Name,
-
-// 		false,
-// 		false,
-// 		amqp091.Publishing{
-// 			ContentType: "text/plain",
-// 			Body:        msg,
-// 		})
-
-// 	if err != nil {
-// 		log.Fatalf("error when sending msg : %v", err)
-// 	}
-
-// 	log.Printf(" [x] Received %vn", msg)
-// }
+	return msgs, nil
+}

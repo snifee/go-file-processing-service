@@ -19,13 +19,32 @@ services:
       - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
   upload-service:
     container_name: file-upload-service
-    image: docker.io/library/file-upload-service
+    image: docker.io/library/upload-service
     ports:
       - "8080:8080"
     depends_on:
-      - minio
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
+        # restart: true
+      minio:
+        condition: service_started
+  file-processing-engine:
+    container_name: file-processing-engine
+    image: docker.io/library/file-processing-engine
+    ports:
+      - "8081:8080"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+        # restart: true
+      minio:
+        condition: service_started
 volumes:
   rabbitmq_data:

@@ -49,7 +49,7 @@ func (h *FileUploadHandler) uploadFile(c *gin.Context) {
 
 	if request.File.Header.Get("Content-Type") != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" {
 		c.JSON(400, dto.Response{
-			Message:    "File type must be pdf",
+			Message:    "File type must be xlsx",
 			StatusCode: 400,
 			Data:       nil,
 		})

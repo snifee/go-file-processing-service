@@ -7,7 +7,9 @@ import (
 )
 
 type ExcelFile struct {
-	file *excelize.File
+	file      *excelize.File
+	header    *excelize.HeaderFooterOptions
+	SheetList []string
 }
 
 func NewExcelFile(reader io.Reader, sheetName string) (*ExcelFile, error) {
@@ -17,11 +19,12 @@ func NewExcelFile(reader io.Reader, sheetName string) (*ExcelFile, error) {
 	}
 
 	return &ExcelFile{
-		file: file,
+		file:      file,
+		SheetList: file.GetSheetList(),
 	}, nil
 }
+func (f *ExcelFile) GetRows(sheetList string) ([][]string, error) {
 
-func (f *ExcelFile) GetRows() ([][]string, error) {
 	rows, err := f.file.GetRows("Sheet")
 	if err != nil {
 		return nil, err

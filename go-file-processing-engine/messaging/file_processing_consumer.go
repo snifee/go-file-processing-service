@@ -1,9 +1,10 @@
-package handler
+package messaging
 
 import (
 	"go-file-processing-engine/config"
 	"go-file-processing-engine/internal/repository"
 	"go-file-processing-engine/internal/service"
+	"log"
 )
 
 type FileProcessingConsumer struct {
@@ -13,17 +14,32 @@ type FileProcessingConsumer struct {
 
 func NewFileProcessingConsumer(app *config.ApplicationBootstrap) *FileProcessingConsumer {
 
-	repo := repository.NewFileUploadLogRepository(app.Database)
+	repo := repository.NewProductRepository(app.Database)
 	service := service.NewFileUploadService(repo, app)
 
-	handler := &FileProcessingConsumer{
+	consumer := &FileProcessingConsumer{
 		fileUploadService: service,
 		consumer:          app.Consumer,
 	}
 
-	return handler
+	return consumer
 }
 
-func (h *FileProcessingConsumer) processFile() {
+func (c *FileProcessingConsumer) StartProcessingFile() {
+	msgs, err := c.consumer.ReceiveMessage()
+
+	if err != nil {
+		log.Printf("error accour when try to start receive message : %v", err.Error())
+	}
+
+	go func() {
+		for m := range msgs {
+			log.Printf("Received a message: %s", m.Body)
+			// dotCount := bytes.Count(m.Body, []byte("."))
+			c.fileUploadService.ProcessFile(string(m.Body))
+			log.Printf("Done")
+			m.Ack(false)
+		}
+	}()
 
 }

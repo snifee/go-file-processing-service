@@ -44,7 +44,7 @@ func NewPublisher(url string) *Publisher {
 	}
 }
 
-func (p *Publisher) CreateChannel() *PublisherChannel {
+func (p *Publisher) CreateChannel(queueName string) *PublisherChannel {
 	ch, err := p.conn.Channel()
 
 	if err != nil {
@@ -52,12 +52,12 @@ func (p *Publisher) CreateChannel() *PublisherChannel {
 	}
 
 	queue, err := ch.QueueDeclare(
-		"file-processing-queue", // name
-		false,                   // durable
-		false,                   // delete when unused
-		false,                   // exclusive
-		false,                   // no-wait
-		nil,                     // arguments
+		queueName, // name
+		false,     // durable
+		false,     // delete when unused
+		false,     // exclusive
+		false,     // no-wait
+		nil,       // arguments
 	)
 
 	if err != nil {
