@@ -26,7 +26,7 @@ func NewFileProcessingConsumer(app *config.ApplicationBootstrap) *FileProcessing
 }
 
 func (c *FileProcessingConsumer) StartProcessingFile() {
-	msgs, err := c.consumer.ReceiveMessage()
+	msgs, err := c.consumer.StartReceiveMessage()
 
 	if err != nil {
 		log.Printf("error accour when try to start receive message : %v", err.Error())

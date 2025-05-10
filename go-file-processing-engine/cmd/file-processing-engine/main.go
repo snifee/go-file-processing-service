@@ -8,11 +8,14 @@ import (
 )
 
 func main() {
+	log.Println("Application running")
+
 	app := config.NewAppication()
 
 	messaging := messaging.NewFileProcessingConsumer(app)
-	messaging.StartProcessingFile()
+	for {
+		messaging.StartProcessingFile()
+	}
 
 	// app.Server.Engine.Run(":8080")
-	log.Println("Application running")
 }

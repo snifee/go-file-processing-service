@@ -44,14 +44,14 @@ func (m *MinioClient) GetObjectFileReader(fileName, bucketName string) (io.Reade
 
 	object, err := m.client.GetObject(ctx, bucketName, fileName, minio.GetObjectOptions{})
 	if err != nil {
-		log.Println("Fail upload file to Minio Server\n" + err.Error())
+		log.Printf("Fail to get file [%s] from Minio Server | %s\n", fileName, err.Error())
 		return nil, err
 	}
 
 	var objectBytes []byte
 	_, err = object.Read(objectBytes)
 	if err != nil {
-		log.Println("Fail upload file to Minio Server\n" + err.Error())
+		log.Printf("Fail to read file [%s] from Minio Server | %s\n", fileName, err.Error())
 		return nil, err
 	}
 
