@@ -23,7 +23,7 @@ func NewMinioClient(endpoint, accesskey, secret string) *MinioClient {
 	// Initialize minio client object.
 	client, err := minio.New(endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(accesskey, secret, ""),
-		Secure: true,
+		Secure: false,
 	})
 	if err != nil {
 		log.Println(endpoint)
@@ -31,7 +31,7 @@ func NewMinioClient(endpoint, accesskey, secret string) *MinioClient {
 
 	}
 
-	log.Printf("%#v\n", client) // minioClient is now set up
+	log.Printf("Connected to Minio server") // minioClient is now set up
 
 	return &MinioClient{
 		client: client,

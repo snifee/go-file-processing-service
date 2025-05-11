@@ -20,7 +20,7 @@ func NewDatabase(dsn string) *gorm.DB {
 		log.Fatalln(err.Error())
 	}
 
-	// log.Printf("%#v\n", db)
+	log.Printf("Connected to Postgres DB")
 
 	return db
 }

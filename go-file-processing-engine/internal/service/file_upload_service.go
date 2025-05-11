@@ -41,7 +41,7 @@ func (s *FileUploadService) ProcessFile(fileName string) error {
 
 	file, err := utils.NewExcelFile(reader, "sheet1")
 	if err != nil {
-		log.Println("error when creating excel file")
+		log.Printf("error when creating excel for file [%s]: [%s]", fileName, err.Error())
 		return err
 	}
 

@@ -13,9 +13,9 @@ func main() {
 	app := config.NewAppication()
 
 	messaging := messaging.NewFileProcessingConsumer(app)
-	for {
-		messaging.StartProcessingFile()
-	}
+	// for {
+	messaging.StartProcessingFile()
+	// }
 
 	// app.Server.Engine.Run(":8080")
 }

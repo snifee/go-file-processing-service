@@ -1,9 +1,7 @@
 package config
 
 import (
-	"context"
 	"log"
-	"time"
 
 	"github.com/rabbitmq/amqp091-go"
 )
@@ -60,11 +58,7 @@ func NewConsumer(url string, queueName string) *Consumer {
 
 func (c *Consumer) StartReceiveMessage() (<-chan amqp091.Delivery, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	msgs, err := c.channel.ConsumeWithContext(
-		ctx,
+	msgs, err := c.channel.Consume(
 		c.queue.Name,
 		"",
 		false,
