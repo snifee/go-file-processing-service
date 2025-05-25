@@ -47,6 +47,8 @@ func (h *FileUploadHandler) uploadFile(c *gin.Context) {
 		return
 	}
 
+	log.Printf(request.File.Header.Get("Content-Type"))
+
 	if request.File.Header.Get("Content-Type") != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" {
 		c.JSON(400, dto.Response{
 			Message:    "File type must be xlsx",

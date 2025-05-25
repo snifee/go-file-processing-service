@@ -13,7 +13,7 @@ type ExcelFile struct {
 }
 
 func NewExcelFile(reader io.Reader, sheetName string) (*ExcelFile, error) {
-	file, err := excelize.OpenReader(reader, excelize.Options{})
+	file, err := excelize.OpenReader(reader)
 	if err != nil {
 		return nil, err
 	}

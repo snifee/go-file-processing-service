@@ -48,9 +48,15 @@ func (c *FileProcessingConsumer) StartProcessingFile() {
 			}
 			// Read data from the buffer into the struct, handling endianness
 
-			c.fileUploadService.ProcessFile(data.Filename)
+			err = c.fileUploadService.ProcessFile(data.Filename)
+			if err != nil {
+				m.Ack(false)
+				log.Printf("Failed to process file [%s]", data.Filename)
+				continue
+			}
+
+			m.Ack(true)
 			log.Printf("Done")
-			m.Ack(false)
 		}
 	}()
 

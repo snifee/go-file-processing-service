@@ -1,11 +1,15 @@
 package service
 
 import (
+	"bytes"
+	"fmt"
 	"go-file-processing-engine/config"
 	"go-file-processing-engine/internal/model/entity"
 	"go-file-processing-engine/internal/repository"
 	"go-file-processing-engine/utils"
+	"io"
 	"log"
+	"os"
 	"strconv"
 
 	"github.com/spf13/viper"
@@ -33,13 +37,27 @@ func NewFileUploadService(repository *repository.ProductRepository, app *config.
 
 func (s *FileUploadService) ProcessFile(fileName string) error {
 
-	reader, err := s.minioClient.GetObjectFileReader(fileName, s.configuration.GetString("minio.dir.bucketName"))
+	byteData, err := s.minioClient.GetObjectFileReader(fileName, s.configuration.GetString("minio.dir.bucketName"))
 	if err != nil {
 		log.Println("error when get object")
 		return err
 	}
 
-	file, err := utils.NewExcelFile(reader, "sheet1")
+	reader := bytes.NewReader(byteData)
+
+	localFile, err := os.Create(fileName)
+	if err != nil {
+		fmt.Println(err)
+
+	}
+	defer localFile.Close()
+
+	if _, err = io.Copy(localFile, reader); err != nil {
+		fmt.Println(err)
+
+	}
+
+	file, err := utils.NewExcelFile(reader, "Sheet1")
 	if err != nil {
 		log.Printf("error when creating excel for file [%s]: [%s]", fileName, err.Error())
 		return err

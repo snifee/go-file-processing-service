@@ -1,9 +1,7 @@
 package config
 
 import (
-	"bytes"
 	"context"
-	"io"
 	"log"
 
 	"github.com/minio/minio-go/v7"
@@ -38,9 +36,9 @@ func NewMinioClient(endpoint, accesskey, secret string) *MinioClient {
 	}
 }
 
-func (m *MinioClient) GetObjectFileReader(fileName, bucketName string) (io.Reader, error) {
-	var result io.Reader
+func (m *MinioClient) GetObjectFileReader(fileName, bucketName string) ([]byte, error) {
 	ctx := context.Background()
+	defer ctx.Done()
 
 	object, err := m.client.GetObject(ctx, bucketName, fileName, minio.GetObjectOptions{})
 	if err != nil {
@@ -48,14 +46,14 @@ func (m *MinioClient) GetObjectFileReader(fileName, bucketName string) (io.Reade
 		return nil, err
 	}
 
-	var objectBytes []byte
-	_, err = object.Read(objectBytes)
+	defer object.Close()
+
+	var result []byte
+	_, err = object.Read(result)
 	if err != nil {
-		log.Printf("Fail to read file [%s] from Minio Server | %s\n", fileName, err.Error())
+		log.Printf("Fail to read file [%s] from Minio Object | %s\n", fileName, err.Error())
 		return nil, err
 	}
-
-	result = bytes.NewReader(objectBytes)
 
 	return result, nil
 }
